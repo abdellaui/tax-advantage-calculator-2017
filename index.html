@@ -1,0 +1,408 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <!-- (c) Abdullah Sahin - 2017 -->
+  <!-- Überschrift-->
+  <title>Methodenvergleich - Versteuerung, 1 %, Fahrtenbuch, Dienstwagen</title>
+  <!-- Hintergrundinformation der Webseite-->
+  <meta charset="utf-8">
+  <meta name="keywords" content="Versteuerung, 1 %, Fahrtenbuch, Dienstwagen">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- Formatierung mit CSS-->
+  <style type="text/css">
+    /* Schriftart und Schriftgröße */
+    * {
+      font-family: Georgia;
+      font-size: 12pt;
+    }
+
+    /* Ausrichtung und Text-Abstand zum Feld */
+    label {
+      width: 33em;
+      float: left;
+    }
+
+    /* Rahmengröße */
+    form {
+      width: 60em;
+    }
+
+    /* Position und Ausrichung von i */
+    div.infoboxholder {
+      display: inline;
+      position: relative
+    }
+
+    div.checkboxholder {
+      /*NEU*/
+      padding-left: 30px;
+      display: inline;
+      position: relative
+    }
+
+    a.infobox {
+      text-decoration: none;
+      position: absolute;
+      left: 3px;
+      top: 0px;
+      font-size: 15px;
+      border-radius: 50% !important;
+      -webkit-border-radius: 50% !important;
+      -moz-border-radius: 50% !important;
+      background: #B5B1A9;
+      color: white;
+      height: 19px;
+      width: 19px;
+      min-height: 19px;
+      min-width: 19px;
+      text-align: center;
+    }
+
+    a.infobox:hover {
+      cursor: help;
+      background: #001746;
+    }
+
+    /* Position und Ausrichtung von Infobox */
+    a.infobox span {
+      visibility: hidden;
+      position: absolute;
+      left: -99em;
+      margin-top: 1.2em;
+      padding: 1em;
+      text-decoration: none;
+      z-index: 100;
+      min-width: 29em;
+      max-width: 29em;
+      text-align: left;
+      font-size: 12px;
+    }
+
+    a.infobox:hover span,
+    a.infobox:focus span,
+    a.infobox:active span {
+      visibility: visible;
+      left: 1em;
+      border: 1px solid #B5B1A9;
+      color: black;
+      background: white;
+    }
+
+    /* Position von Text im Rahmen*/
+    .inputfeld {
+      margin: 15px 25px;
+    }
+
+    /* Ausrichtung von Legende */
+    legend {
+      font-weight: bold;
+      padding: 3px 15px;
+      border: 1px solid #001746;
+      border-radius: 3px;
+      -moz-border-radius: 3px;
+      -webkit-border-radius: 3px;
+    }
+
+    /* Position wo der Rahmen auf der Seite beginnen soll*/
+    fieldset {
+      margin: 10px 5px;
+      border-radius: 3px;
+      -moz-border-radius: 3px;
+      -webkit-border-radius: 3px;
+      border: 1px solid #001746;
+    }
+
+    /* Aussehen von "berechnen" Knopf */
+    #dritteBerechnen,
+    #zweiteBerechnen,
+    #ersteBerechnung {
+      padding: 2px 7px;
+      cursor: pointer;
+      background: #001746;
+      color: white;
+    }
+
+    #ersteBerechnung {
+      width: 147px;
+      min-width: 147px;
+      text-align: center;
+    }
+
+    #dritteBerechnen,
+    #zweiteBerechnen {
+      width: 303px;
+      min-width: 303px;
+      text-align: center;
+    }
+
+    /* Aussehen vom Inputfeld*/
+    input {
+      border-radius: 3px;
+      -moz-border-radius: 3px;
+      -webkit-border-radius: 3px;
+      border: 1px solid #B5B1A9;
+      padding: 2px 6px;
+      max-width: 135px;
+      text-align: right;
+    }
+  </style>
+  <script>
+    // Globale Variablen:
+    var blpValue, mgkValue, bfValue, entfernungaValue, entfernungbValue, anzahlValue, anzahl2Value;
+    var neustartRechnung = function () {
+      window.location.reload();
+    }
+
+    var inouv = function (typ, get) {  // INPUT OUTPUT VERARBEITER
+      if (typ == 1) {
+        return parseFloat(get.replace(/\./g, "").replace(",", "."));   // INPUT
+      } else {
+        return get.toFixed(2).replace(".", ",");    // OUTPUT
+      }
+    }
+
+    var checkForm = function (number) {
+      return number.toString().match(/^[0-9]+([,\.][0-9]+)?$/gi);
+    }
+
+    var berechnen = function () {
+
+      // Wert auslesen
+      blpValue = (Math.floor(inouv(1, FORMULAR.blp.value) / 100) * 100);
+      mgkValue = Math.floor(inouv(1, FORMULAR.mgk.value));
+      bfValue = Math.floor(inouv(1, FORMULAR.bf.value));
+      entfernungaValue = Math.floor(inouv(1, FORMULAR.entfernunga.value));
+      entfernungbValue = Math.floor(inouv(1, FORMULAR.entfernungb.value));
+      anzahlValue = Math.floor(inouv(1, FORMULAR.anzahl.value));
+      anzahl2Value = Math.floor(inouv(1, FORMULAR.anzahl2.value));
+      abfrageaValue = FORMULAR.abfragea.value;
+      abfragebValue = FORMULAR.abfrageb.value;
+
+      // Fehlermeldung bei fehlendem Pflichtfeld
+      if (
+        checkForm(blpValue) && checkForm(mgkValue) && checkForm(bfValue) && checkForm(entfernungaValue)
+        && (
+          ((abfrageaValue == 'abfrageanein' && checkForm(anzahlValue)) || abfrageaValue == 'abfrageaja')
+          &&
+          ((abfragebValue == 'abfragebja' && checkForm(anzahl2Value) && checkForm(entfernungbValue)) || abfragebValue == 'abfragebnein')
+        )
+      ) {
+
+        //Geldwerter Vorteil Berechnung
+        if (abfrageaValue == "abfrageaja" || parseFloat(anzahlValue) > 15) {
+          var gvb1Result = 0.01 * blpValue + 0.0003 * blpValue * entfernungaValue;
+
+        } else {
+          gvb1Result = 0.01 * blpValue + 0.00002 * blpValue * entfernungaValue * anzahlValue;
+
+        } if (parseFloat(anzahl2Value) > 4) {
+          gvb2Result = 0.00002 * blpValue * entfernungbValue * (anzahl2Value - 4);
+
+        } else {
+          gvb2Result = 0;
+        }
+        gvbResult = gvb1Result + gvb2Result;
+        FORMULAR.gvb.value = (inouv(2, gvbResult));
+
+        //Kilometer indifferent Berechnung  
+        var bebResult = (gvbResult * bfValue) / (mgkValue - gvbResult);
+        FORMULAR.beb.value = (inouv(2, bebResult));
+        document.getElementById("ergebnisfenster").style.display = 'block';
+
+        /* NEU */
+        if (bebResult < 0) {
+          alert("Die Privatfahrt ist negativ, bitte überprüfen Sie Ihre Eingaben.");
+        }
+
+      } else {
+        alert("Bitte geben Sie alle Pflichtfelder mit gültiger Formatierung an!");
+      }
+    }
+
+    var abfrageHandler = function (e) {
+      if (e.value == 'abfrageaja') {
+        document.getElementById("haeufigkeita").style.display = 'none';
+      }
+      if (e.value == 'abfrageanein') {
+        document.getElementById("haeufigkeita").style.display = 'block';
+      }
+      if (e.value == 'abfragebja') {
+        document.getElementById("entfernungb").style.display = 'block';
+        document.getElementById("haeufigkeitb").style.display = 'block';
+      }
+      if (e.value == 'abfragebnein') {
+        document.getElementById("entfernungb").style.display = 'none';
+        document.getElementById("haeufigkeitb").style.display = 'none';
+      }
+    }
+
+  </script>
+</head>
+
+<body>
+  <a href="/netto.html"><button>Nettounterschied - Lohn sich ein Dienstwagen?</button></a>
+  <hr>
+  <form name="BerechnungMV">
+    <!-- Eingabe Fenester-->
+    <fieldset>
+      <legend>Eingabe</legend>
+      <label for="Allgemeine"> <b>Allgemeine Angaben:</b></label><br>
+      <!-- Eingabe Bruttolistenpreis-->
+      <div class="inputfeld">
+        <label for="blp"> Bruttolistenpreis abgerundet auf volle Hundert Euro:*</label>
+        <div class="infoboxholder"><a class="infobox" href="#INFO">i<span>
+              Der Bruttolistenpreis setzt sich zusammen aus:<br>
+              - Listenpreis des Herstellers zum Zeitpunkt der Erstzulassung<br>
+              - Kosten f&uuml;r Sonderausstattung<br>
+              - Umsatzsteuer<br> </span> </a>
+          <input type="text" name="blp" pattern="(-|\+)?[0-9]+([,\.][0-9]+)?" title="Bitte nur Zahlen angeben!" /> EUR
+        </div>
+      </div>
+      <!-- Eingabe Monatliche Gesamtkosten-->
+      <div class="inputfeld">
+        <label for="mgk"> Vom Arbeitgeber getragene monatlichen Gesamtkosten:*</label>
+        <div class="infoboxholder"><a class="infobox" href="#INFO">i<span>
+              Fragen Sie Ihren Arbeitgeber wie hoch die monatlich Gesamtkosten sind. Hierzu geh&ouml;ren u.a.:
+              <br>- Benzinkosten
+              <br>- Wartungs- und Reparaturkosten
+              <br>- Kfz-Steuer
+              <br>- Haftpflichtversicherung
+              <br>- Absetzung f&uuml;r Abnutzung (AfA/Abschreibung)
+              <br>- Zinsen f&uuml;r Anschaffungskredite<br></span></a>
+          <input type="text" name="mgk" pattern="(-|\+)?[0-9]+([,\.][0-9]+)?" title="Bitte nur Zahlen angeben!" /> EUR
+        </div>
+      </div>
+      <!-- Eingabe Betriebsfahrt-->
+      <div class="inputfeld">
+        <label for="bf">Betriebsfahrten in km:*</label>
+        <div class="infoboxholder"><a class="infobox" href="#INFO">i<span>
+              Hierzu z&auml;hlen alle dienstlichen get&auml;tigten Fahrten.<br></span></a>
+          <input type="text" name="bf" pattern="(-|\+)?[0-9]+([,\.][0-9]+)?" title="Bitte nur Zahlen angeben!" /> km
+        </div>
+      </div>
+      <!-- Eingabe Entfernunga-->
+      <label for="Arbeitsweg"> <b>Angaben zum Arbeitsweg:</b></label><br>
+      <div class="inputfeld">
+        <label for="entfernunga"> Einfache Entfernung abgerundet auf volle Kilometer:*</label>
+        <div class="infoboxholder">
+          <a class="infobox" href="#INFO">i<span>
+              Hierbei z&auml;hlt nur die <font color="red">einfache Strecke</font> zwischen Wohnung und Firma und <font
+                color="red">nicht</font> der zur&uuml;ckgelegte Hin- und R&uuml;ckweg.<br></span></a>
+          <input type="text" name="entfernunga" pattern="(-|\+)?[0-9]+([,\.][0-9]+)?"
+            title="Bitte nur Zahlen angeben!" /> km
+        </div>
+      </div>
+      <!-- Abfrage Entfernunga-->
+      <div class="inputfeld">
+        <label for="abfragea"> Mind. 15-tägige Nutzung im Monat zur Firma?*</label>
+        <div class="checkboxholder"><a class="infobox" href="#INFO">i<span>
+              Hierbei stellt sich die Frage, wie oft Sie mit dem Dienstwagen zur Firma fahren.<br>
+              Direkte Fahrten zu Kunden zählen <font color="red">nicht</font> als Fahrten zur Firma.<br></span></a>
+          <input type="radio" name="abfragea" onclick="abfrageHandler(this);" value="abfrageanein" /> nein <input
+            type="radio" name="abfragea" onclick="abfrageHandler(this);" value="abfrageaja" checked /> ja
+        </div>
+      </div>
+      <!-- Häufigkeit zu Entfernunga-->
+      <div class="inputfeld" id="haeufigkeita" style="display:none">
+        <label for="haeufigkeita"> Anzahl der Fahrten:*</label>
+        <div class="infoboxholder">
+          <a class="infobox" href="#INFO">i<span>
+              Wie viele Tage werden Sie den Dienstwagen f&uuml;r die Fahrt zur Firma nutzen?<br></span></a>
+          <input type="text" name="anzahl" pattern="(-|\+)?[0-9]+([,\.][0-9]+)?" title="Bitte nur Zahlen angeben!" />
+          mal
+        </div>
+      </div>
+      <!-- Abfrage Entfernungb-->
+      <label for="doppelte Haushaltsführung"> <b>Angaben zur doppelten Haushaltsführung:</b></label><br>
+      <div class="inputfeld">
+        <label for="abfrageb"> F&uuml;hren Sie einen doppelten Haushalt?*</label>
+        <div class="checkboxholder"><a class="infobox" href="#INFO">i<span>
+              Haben Sie einen angemeldeten 2.Wohnsitz in einer anderen Stadt?<br></span></a>
+          <input type="radio" name="abfrageb" onclick="abfrageHandler(this);" value="abfragebnein" checked /> nein
+          <input type="radio" name="abfrageb" onclick="abfrageHandler(this);" value="abfragebja" /> ja
+        </div>
+      </div>
+      <!-- Eingabe Entfernungb-->
+      <div class="inputfeld" id=entfernungb style="display:none">
+        <label for="entfernungb"> Einfache Entfernung abgerundet auf volle Kilometer:*</label>
+        <div class="infoboxholder"><a class="infobox" href="#INFO">i<span>
+              Hierbei z&auml;hlt die <font color="red">einfache</font> Strecke zwischen Erst- und Zweitwohnsitz und
+              <font color="red">nicht</font> die gesamte zur&uuml;ckgelegte Strecke.
+            </span></a>
+          <input type="text" name="entfernungb" pattern="(-|\+)?[0-9]+([,\.][0-9]+)?"
+            title="Bitte nur Zahlen angeben!" /> km
+        </div>
+      </div>
+      <!-- Häufigkeit zu Entfernungb-->
+      <div class="inputfeld" id="haeufigkeitb" style="display:none">
+        <label for="haeufigkeitb">Anzahl der Fahrten:*</label>
+        <div class="infoboxholder">
+          <a class="infobox" href="#INFO">i<span>
+              Wie oft werden Sie mit dem Dienstwagen zum Hauptwohnsitz fahren?<br></span></a>
+          <input type="text" name="anzahl2" pattern="(-|\+)?[0-9]+([,\.][0-9]+)?" title="Bitte nur Zahlen angeben!" />
+          mal
+        </div>
+      </div>
+      <!-- Button berechnen-->
+      <div class="inputfeld">
+        <label for="button"><b>* Pflichtfeld</b></label>
+        <input type="button" id="ersteBerechnung" value="berechnen" onclick="berechnen()" />
+      </div>
+    </fieldset>
+    <!-- Ergebnis Geldwerter Vorteil-->
+    <div id="ergebnisfenster" style="display:none">
+      <fieldset>
+        <legend>Ergebnis</legend>
+        <div class="inputfeld">
+          <label for="gv">Geldwerter Vorteil:</label>
+          <div class="infoboxholder">
+            <a class="infobox" href="#INFO">i<span>
+                Private Nutzung + Arbeitsweg + Doppelte Haushaltsf&uuml;hrung<br><br>
+                <font color="black">Private Nutzung:</font><br>
+                1 % x Bruttolistenpreis<br><br>
+                <font color="black">Arbeitsweg:</font><br>
+                Wenn Sie weniger als 15 Tagen den Dienstwagen zur Firma nutzen:<br>
+                0,002 % x Bruttolistenpreis x Entfernung zur Firma x Anzahl Tage <br><br>
+                Wenn Sie mindestens 15 Tagen den Dienstwagen zur Firma nutzen:
+                0,03 % x Bruttolistenpreis x Entfernung zur Firma<br><br>
+                <font color="black">Doppelte Haushaltsführung:</font><br>
+                Wenn Sie einmal w&ouml;chentlich mit dem Dienstwagen zum Hauptwohnsitz fahren,
+                wird kein separater geldwerter Vorteil berechnet. Erst wenn Sie &ouml;fter fahren,
+                wird der geldwerte Vorteil für die Tage, die Sie mehr gefahrten sind folgendermaßen berechnet:<br>
+                0,002 % x Bruttolistenpreis x Entfernung zum Hauptwohnsitz x Anzahl Tage<br>
+                <br>
+              </span></a>
+            <input type="text" readonly="readonly" name="gvb" /> EUR
+          </div>
+        </div>
+        <div class="inputfeld">
+          <label for="an">Privatfahrt:</label>
+          <div class="infoboxholder">
+            <a class="infobox" href="#INFO">i<span>
+                Privatfahrt = (geldwerte Vorteil x Betriebsfahrt)/((Gesamtkosten-geldwerte Vorteil)) </span></a>
+            <input type="text" readonly="readonly" name="beb" /> km
+          </div>
+          <br>
+          <p style="line-height: 150%"> Bis zu diesem Kilometer lohnt sich die Fahrtenbuch-Methode. Sollten Sie mehr
+            fahren lohnt sich die Ein-Prozent-Methode. Bedenken Sie, dass die Fahrten von der Wohnung zur Firma auch zu
+            den Privatfahrten z&auml;hlen.</p>
+        </div>
+      </fieldset>
+    </div>
+    </div>
+    <div class="inputfeld">
+      <input type="button" name="resetknopf" id="dritteBerechnen" value="neu berechnen" onclick="neustartRechnung()"
+        size="15" />
+    </div>
+  </form>
+  <script>
+      // RESETTED FORM BEI RELOAD
+      (function () {
+        FORMULAR = document.BerechnungMV;
+        FORMULAR.reset();
+      })();
+  </script>
+</body>
+
+</html>

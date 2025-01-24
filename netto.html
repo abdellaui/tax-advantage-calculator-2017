@@ -1,0 +1,974 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <!-- (c) Abdullah Sahin - 2017 -->
+
+  <!-- Überschrift-->
+  <title>Nettounterschied - Lohn sich ein Dienstwagen?</title>
+  <!-- Hintergrundinformation der Webseite-->
+  <meta charset="utf-8">
+  <meta name="keywords" content="Lohn sich ein Dienstwagen">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- Formatierung mit CSS-->
+  <style type="text/css">
+    /* Schriftart und Schriftgröße */
+    * {
+      font-family: Georgia;
+      font-size: 12pt;
+    }
+
+    /* Ausrichtung und Text-Abstand zum Feld */
+    label {
+      width: 30em;
+      float: left;
+    }
+
+    /* Rahmengröße */
+    form {
+      width: 60em;
+    }
+
+    /* Position und Ausrichtung von i */
+    div.infoboxholder {
+      display: inline;
+      position: relative
+    }
+
+    div.checkboxholder {
+      /*NEU*/
+      padding-left: 30px;
+      display: inline;
+      position: relative
+    }
+
+    a.infobox {
+      text-decoration: none;
+      position: absolute;
+      left: 3px;
+      top: 0px;
+      font-size: 15px;
+      border-radius: 50% !important;
+      -webkit-border-radius: 50% !important;
+      -moz-border-radius: 50% !important;
+      background: #B5B1A9;
+      color: white;
+      height: 19px;
+      width: 19px;
+      min-height: 19px;
+      min-width: 19px;
+      text-align: center;
+    }
+
+    a.infobox:hover {
+      cursor: help;
+      background: #001746;
+    }
+
+    /* Position und Ausrichung von Infobox */
+    a.infobox span {
+      visibility: hidden;
+      position: absolute;
+      left: -99em;
+      margin-top: 1.2em;
+      padding: 1em;
+      text-decoration: none;
+      z-index: 100;
+      min-width: 33em;
+      max-width: 33em;
+      text-align: left;
+      font-size: 12px;
+    }
+
+    a.infobox:hover span,
+    a.infobox:focus span,
+    a.infobox:active span {
+      visibility: visible;
+      left: 1em;
+      border: 1px solid #B5B1A9;
+      color: black;
+      background: white;
+    }
+
+    /* Position von Text im Rahmen*/
+    .inputfeld {
+      margin: 15px 25px;
+    }
+
+    /* Ausrichtung von Legende */
+    legend {
+      font-weight: bold;
+      padding: 3px 15px;
+      border: 1px solid #001746;
+      border-radius: 3px;
+      -moz-border-radius: 3px;
+      -webkit-border-radius: 3px;
+    }
+
+    /* Position wo der Rahmen auf der Seite beginnen soll*/
+    fieldset {
+      margin: 10px 5px;
+      border-radius: 3px;
+      -moz-border-radius: 3px;
+      -webkit-border-radius: 3px;
+      border: 1px solid #001746;
+    }
+
+    /* Aussehen vom Inputfeld*/
+    input {
+      border-radius: 3px;
+      -moz-border-radius: 3px;
+      -webkit-border-radius: 3px;
+      border: 1px solid #B5B1A9;
+      padding: 2px 6px;
+      max-width: 135px;
+      text-align: right;
+    }
+
+    /* Aussehen von Listenauswahl*/
+    select {
+      border-radius: 3px;
+      -moz-border-radius: 3px;
+      -webkit-border-radius: 3px;
+      border: 1px solid B5B1A9;
+      padding: 2px 20px;
+      max-width: 303px;
+      width: 260px;
+      text-align: center;
+    }
+
+    /* Aussehen von "berechnen" Knopf */
+    #dritteBerechnen,
+    #ersteBerechnung {
+      padding: 2px 7px;
+      cursor: pointer;
+      background: #001746;
+      color: white;
+    }
+
+    #ersteBerechnung {
+      width: 147px;
+      min-width: 147px;
+      text-align: center;
+    }
+
+    #dritteBerechnen {
+      width: 303px;
+      min-width: 303px;
+      text-align: center;
+    }
+
+    /* Ausrichtung von mit/ohne Dienstwagen */
+    #bruttoEinkommenzwei {
+      width: 10em;
+      padding-left: 1.4em;
+    }
+
+    #bruttoEinkommeneins {
+      width: 10em;
+      padding-left: 32.0em;
+    }
+
+    /* Aussehen von Nettounterschied-Feld*/
+    .nettounterschied {
+      max-width: 288px;
+      width: 288px;
+      text-align: center;
+    }
+
+    .fahrtenbuchmethode {
+      margin-left: 47px;
+    }
+
+    .gehaltkuerzung {
+      margin-left: 10px;
+    }
+  </style>
+  <script>
+    // Globale Variablen:  
+    var bruttoEinkommen;
+    var neuBruttoEinkommen;
+    var geldwerteVorteil;
+    var isErsteBerechnungTrue = false;
+
+
+
+
+    var neustartRechnung = function () {
+      window.location.reload();
+    }
+
+    // EXTERNE SEITE AUFRUFEN ANFANG
+    function load_extern_xml(einkommen, steuerklasse) {
+      document.getElementById("waitingpls").style.display = "inline-block";
+      var xhr;
+      var json = 0;
+      if (typeof XMLHttpRequest !== 'undefined') xhr = new XMLHttpRequest();
+      else {
+        var versions = ["MSXML2.XmlHttp.5.0",
+          "MSXML2.XmlHttp.4.0",
+          "MSXML2.XmlHttp.3.0",
+          "MSXML2.XmlHttp.2.0",
+          "Microsoft.XmlHttp"]
+
+        for (var i = 0, len = versions.length; i < len; i++) {
+          try {
+            xhr = new ActiveXObject(versions[i]);
+            break;
+          }
+          catch (e) { }
+        } // end for
+      }
+
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          json = JSON.parse(xhr.responseText);
+          console.log(json);
+          json = json.query.results.body.lohnsteuer.ausgaben.ausgabe.ausgabe.ausgabe.ausgabe.value;
+        }
+      }
+      xhr.open('GET', 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%27https%3A%2F%2Fwww.bmf-steuerrechner.de%2Finterface%2FLSt2017.jsp%3FLZZ%3D2%26RE4%3D' + (einkommen * 100) + '%26STKL%3D' + steuerklasse + '%27&format=json', false);
+      xhr.send('');
+      document.getElementById("waitingpls").style.display = "none";
+      return json;
+    }
+    // EXTERNE SEITE AUFRUFEN ENDE
+
+    var inouv = function (typ, get) {  // INPUT OUTPUT VERARBEITER
+      if (typ == 1) {
+        return parseFloat(get.replace(/\./g, "").replace(",", "."));   // INPUT
+      } else {
+        return get.toFixed(2).replace(".", ",");    // OUTPUT
+      }
+    }
+
+    var checkForm = function (number) {
+      return number.toString().match(/^[0-9]+([,\.][0-9]+)?$/gi);
+    }
+
+
+    var berechnen = function () {
+
+      // Wert auslesen    
+      // Diese Werte sind in Jedemfall bedeckt:
+      var einkommenValue = inouv(1, FORMULAR.einkommen.value);
+      var gehalteValue = inouv(1, FORMULAR.gehalte.value);
+      var artValue = FORMULAR.art.value;
+      var methodeValue = FORMULAR.methode.value;
+      var bundesLand = document.getElementById("bundesland").value;
+      var steuerKlasse = inouv(1, document.getElementById("steuerklasse").value);
+      var ksValue = inouv(1, document.getElementById("kst").value);
+
+      // Werte für E-Methode:
+      var blpValue = Math.floor(inouv(1, FORMULAR.blp.value) / 100) * 100;
+      var entfernungaValue = Math.floor(inouv(1, FORMULAR.entfernunga.value));
+      var anzahlValue = Math.floor(inouv(1, FORMULAR.anzahl.value));
+      var entfernungbValue = Math.floor(inouv(1, FORMULAR.entfernungb.value));
+      var anzahl2Value = Math.floor(inouv(1, FORMULAR.anzahl2.value));
+      var abfrageaValue = FORMULAR.abfragea.value;
+      var abfragebValue = FORMULAR.abfrageb.value;
+
+      // Werte für F-Methoede:
+      var mgkValue = Math.floor(inouv(1, FORMULAR.mgk.value));
+      var pfValue = Math.floor(inouv(1, FORMULAR.pf.value));
+      var bfValue = Math.floor(inouv(1, FORMULAR.bf.value));
+
+      // Pruefung  Boolische Variablen
+      var erstePruefung = checkForm(einkommenValue) && checkForm(gehalteValue) && checkForm(ksValue) && checkForm(steuerKlasse) && bundesLand != "";
+
+      var gultig_Abfrage_A = ((abfrageaValue == "abfrageanein" && checkForm(anzahlValue)) || abfrageaValue == "abfrageaja");
+      var gultig_Abfrage_B = ((abfragebValue == "abfragebja" && checkForm(anzahl2Value) && checkForm(entfernungbValue)) || abfragebValue == "abfragebnein");
+
+      var gultig_Methode_E = (methodeValue == "methodee" && checkForm(blpValue) && checkForm(entfernungaValue) && gultig_Abfrage_A && gultig_Abfrage_B);
+      var gultig_Methode_F = (methodeValue == "methodef" && checkForm(mgkValue) && checkForm(pfValue) && checkForm(bfValue));
+
+
+      // Fehlermeldung bei fehlendem Pflichtfeld
+      if (erstePruefung && (gultig_Methode_E || gultig_Methode_F)) {
+
+        // Ermittlung des Bruttoeinkommens (Fallunterscheidung GK / GE)
+        if (artValue == "gk") {
+          bruttoEinkommen = einkommenValue;   // GLOBALER bruttoEinkommen mit GK
+        } else {
+          bruttoEinkommen = einkommenValue + gehalteValue;  // GLOBALER bruttoEinkommen mit GE
+        }
+        // Ermittelte bruttoEinkommen ausgeben
+        FORMULAR.summe.value = inouv(2, bruttoEinkommen);
+
+        // Ermittlung des Bruttoeinkommens mit Dienstwagen (Fallunterscheidung E- / F-Methode)        
+        if (methodeValue == "methodee") {
+          if (abfrageaValue == "abfrageaja" || parseFloat(anzahlValue) > 15) {
+            var summeneu1Result = (0.01 * blpValue) + (0.0003 * blpValue * entfernungaValue);
+          } else {
+            var summeneu1Result = (0.01 * blpValue) + (0.00002 * blpValue * entfernungaValue * anzahlValue);
+          }
+          if (anzahl2Value > 4) {
+            var summeneu2Result = 0.00002 * blpValue * entfernungbValue * (anzahl2Value - 4);
+          } else {
+            var summeneu2Result = 0.00;
+          }
+          geldwerteVorteil = summeneu1Result + summeneu2Result;    // GLOBALER geldwerteVorteil
+        } else {
+
+          //Kosten pro Kilometer Berechnung
+          var kpkbResult = mgkValue / (pfValue + bfValue);
+
+          //Gesamtergebnis Berechnung
+          geldwerteVorteil = kpkbResult * pfValue;                   // GLOBALER geldwerteVorteil
+        }
+
+        neuBruttoEinkommen = bruttoEinkommen + geldwerteVorteil - gehalteValue; // GLOBALER neuBruttoEinkommen
+
+        // Ermittelte neuBruttoEinkommen ausgeben  (mit Dienstwagen)
+        FORMULAR.summeneu.value = inouv(2, neuBruttoEinkommen);
+
+
+        //-------------------------------------------------------------------------------//
+
+
+        var lohnoValue = parseFloat(load_extern_xml(bruttoEinkommen, steuerKlasse)) / 100;
+        var lohnmValue = parseFloat(load_extern_xml(neuBruttoEinkommen, steuerKlasse)) / 100;
+        console.log(lohnoValue);
+        console.log(lohnmValue);
+        //Externe ABFRAGE
+        // "http://www.bmf-steuerrechner.de/interface/LSt2017.jsp?LZZ=1&RE4=+"bruttoEinkommen*100"+&STKL="+steuerKlasse;   // *100 weil Angabe in Cent
+        // "http://www.bmf-steuerrechner.de/interface/LSt2017.jsp?LZZ=1&RE4=+"neuBruttoEinkommen*100"+&STKL="+steuerKlasse; // *100 weil Angabe in Cent
+
+
+        // BERECHNE 2 HIER
+
+        // Ohne Dienstwagen Berechnung
+        // Bruttoeinkommen
+
+        var zveoResult = bruttoEinkommen;
+        FORMULAR.zveo.value = inouv(2, zveoResult);
+
+        // Sozialabgaben
+        // Krankenversicherung
+        var kvoResult = zveoResult * 0.084;
+        FORMULAR.kvo.value = inouv(2, kvoResult);
+
+        // Pflegeversicherung
+        var pvoResult = zveoResult * 0.01275;
+        FORMULAR.pvo.value = inouv(2, pvoResult);
+
+        // Rentenversicherung
+        var rvoResult = zveoResult * 0.0935;
+        FORMULAR.rvo.value = inouv(2, rvoResult);
+
+        // Arbeitslosenversicherung
+        var avoResult = zveoResult * 0.015;
+        FORMULAR.avo.value = inouv(2, avoResult);
+
+        // Summe Sozialabgaben
+        var ssaoResult = kvoResult + pvoResult + rvoResult + avoResult;
+        FORMULAR.ssao.value = inouv(2, ssaoResult);
+
+        // Steuerabgaben
+        // Lohnsteuer
+        var lohn1oResult = lohnoValue;
+        FORMULAR.lohn1o.value = inouv(2, lohn1oResult);
+
+        // Soli Zuschlag
+        var solioResult = lohnoValue * 0.055;
+        FORMULAR.solio.value = inouv(2, solioResult);
+
+        // Kirchensteuer
+        var kstoResult = lohnoValue * ksValue;
+        FORMULAR.ksto.value = inouv(2, kstoResult);
+
+        // Summe Steuerabgaben
+        var sstaoResult = lohn1oResult + solioResult + kstoResult;
+        FORMULAR.sstao.value = inouv(2, sstaoResult);
+
+        // Geldwerter Vorteil
+        var gvoResult = 0;
+        FORMULAR.gvo.value = inouv(2, gvoResult);
+
+        // Nettolohn
+        var nettooResult = zveoResult - ssaoResult - sstaoResult;
+        FORMULAR.nettoo.value = inouv(2, nettooResult);
+
+        // Mit Dienstwagen Berechnung
+        // Bruttoeinkommen
+        var zvemResult = neuBruttoEinkommen;
+        FORMULAR.zvem.value = (inouv(2, zvemResult));
+        // Sozialabgaben
+        // Krankenversicherung
+        var kvmResult = zvemResult * 0.084;
+        FORMULAR.kvm.value = inouv(2, kvmResult);
+
+        // Pflegeversicherung
+        var pvmResult = zvemResult * 0.01275;
+        FORMULAR.pvm.value = inouv(2, pvmResult);
+
+        // Rentenversicherung
+        var rvmResult = zvemResult * 0.0935;
+        FORMULAR.rvm.value = inouv(2, rvmResult);
+
+        // Arbeitslosenversicherung
+        var avmResult = zvemResult * 0.015;
+        FORMULAR.avm.value = inouv(2, avmResult);
+
+        // Summe Sozialabgaben
+        var ssamResult = kvmResult + pvmResult + rvmResult + avmResult;
+        FORMULAR.ssam.value = inouv(2, ssamResult);
+
+        // Steuerabgaben
+        // Lohnsteuer
+        var lohn1mResult = lohnmValue;
+        FORMULAR.lohn1m.value = (inouv(2, lohn1mResult));
+
+        // Soli Zuschlag
+        var solimResult = lohnmValue * 0.055;
+        FORMULAR.solim.value = (inouv(2, solimResult));
+
+        // Kirchensteuer
+        var kstmResult = lohnmValue * ksValue;
+        FORMULAR.kstm.value = (inouv(2, kstmResult));
+
+        // Summe Steuerabgaben
+        var sstamResult = lohn1mResult + solimResult + kstmResult;
+        FORMULAR.sstam.value = (inouv(2, sstamResult));
+
+        // Geldwerter Vorteil    
+        var gvmResult = geldwerteVorteil;
+        FORMULAR.gvm.value = inouv(2, gvmResult);
+
+        // Nettolohn
+        var nettomResult = zvemResult - ssamResult - sstamResult - gvmResult;
+        FORMULAR.nettom.value = inouv(2, nettomResult);
+
+        // Nettounterschied
+        var nuResult = nettooResult - nettomResult;
+        FORMULAR.nu.value = inouv(2, nuResult);
+
+        isErsteBerechnungTrue = true;  /* CHECKBOX HANDLER DEAKTIVIEREN */
+        document.getElementById("ersteBerechnung").style.display = "none";  //  Erste Button nach Betaetigung ausblenden
+        document.getElementById("eingabefenster").style.display = "block";
+        /* NEU */
+        if (nettooResult < 0 || nettomResult < 0) {
+          alert("Der Nettolohn ist negativ, bitte überprüfen Sie Ihre Eingaben.");
+        }
+
+      } else {
+        alert("Bitte geben Sie alle Pflichtfelder mit gültiger Formatierung an!");
+      }
+    }
+
+
+
+    // <!-- NEU070517 -->
+    var zeigeDetails = function (typ) {
+      if (typ == 2) {
+        document.getElementById("detailierteausgabe").style.display = "block";
+        document.getElementById("anzeigeDetails").style.display = "none";
+        document.getElementById("ausblendeDetails").style.display = "block";
+      } else {
+        document.getElementById("detailierteausgabe").style.display = "none";
+        document.getElementById("anzeigeDetails").style.display = "block";
+        document.getElementById("ausblendeDetails").style.display = "none";
+      }
+    }
+    // <!-- NEU070517 ENDE -->
+
+    var abfrageHandler = function (e) {
+      if (isErsteBerechnungTrue == false) {
+        if (e.value == "gk") {
+          document.getElementById("gehaltelabel").innerHTML = "Bruttogehaltsk&uuml;rzung:";
+        }
+        if (e.value == "ge") {
+          document.getElementById("gehaltelabel").innerHTML = "Bruttogehaltserh&ouml;hung:";
+        }
+        if (e.value == "methodee") {
+          document.getElementById("zeigeeinprozentmethode").style.display = "block";
+          document.getElementById("zeigefahrtenbuchmethode").style.display = "none";
+        }
+        if (e.value == "methodef") {
+          document.getElementById("zeigeeinprozentmethode").style.display = "none";
+          document.getElementById("zeigefahrtenbuchmethode").style.display = "block";
+        }
+        if (e.value == "abfrageaja") {
+          document.getElementById("haeufigkeita").style.display = "none";
+        }
+        if (e.value == "abfrageanein") {
+          document.getElementById("haeufigkeita").style.display = "block";
+        }
+        if (e.value == "abfragebja") {
+          document.getElementById("entfernungb").style.display = "block";
+          document.getElementById("haeufigkeitb").style.display = "block";
+        }
+        if (e.value == "abfragebnein") {
+          document.getElementById("entfernungb").style.display = "none";
+          document.getElementById("haeufigkeitb").style.display = "none";
+        }
+      } else {
+        alert("Sie haben den Formular schon berechnen lassen, weitere Änderungen werden ignoriert!");
+      }
+    }
+
+
+  </script>
+</head>
+
+<body>
+  <a href="/index.html"><button>Methodenvergleich - Versteuerung, 1 %, Fahrtenbuch, Dienstwagen</button></a>
+  <hr>
+  <form name="BerechnungNU">
+    <!-- Eingabe Rahmen-->
+    <fieldset>
+      <legend style="background-color:white">Eingabe</legend>
+      <!-- Eingabe Gehaltserhöhung oder Gehaltsumwandlung-->
+      <label for="Allgemeine"> <b>Allgemeine Angaben:</b></label><br>
+      <div class="inputfeld">
+        <label for="art"> In welcher Form erhalten Sie einen Dienstwagen?*</label>
+        <div class="checkboxholder"><a class="infobox" href="#INFO">i<span>
+              <font color="black">keine Veränderung:</font><br> Wählen Sie Gehaltserhöhung und Tragen bei
+              Bruttogehaltserhöhung eine 0 ein.<br><br>
+              <font color="black">Gehaltserhöhung:</font><br>Hierbei stellt sich die Frage: Bruttogehaltserhöhung oder
+              Dienstwagen.<br><br>
+              <font color="black">Gehaltskürzung:</font><br> Hierbei stellt sich die Frage: Bruttogehaltskürzung oder
+              Dienstwagen.<br>
+            </span></a>
+          <input type="radio" name="art" onclick="abfrageHandler(this);" value="ge" /> Gehaltserh&ouml;hung <input
+            type="radio" name="art" onclick="abfrageHandler(this);" value="gk" class="gehaltkuerzung" checked />
+          Gehaltsumwandlung
+        </div>
+      </div>
+      <!-- Eingabe Ein Prozent-Methode oder Fahrtenbuch-Methode-->
+      <div class="inputfeld">
+        <label for="methode"> Mit welcher Methode versteuern Sie den Dienstwagen?*</label>
+        <div class="checkboxholder"><a class="infobox" href="#INFO">i<span>
+              Wählen Sie eine Methode zur Ermittelung des geldwerten Vorteils.<br>
+              Bei Unsicherheit können Sie sich die optimale Methode bei "Methodenvergleich" ausrechnen
+              lassen.<br></span></a>
+          <input type="radio" name="methode" onclick="abfrageHandler(this);" value="methodee" /> Ein-Prozent <input
+            type="radio" name="methode" onclick="abfrageHandler(this);" value="methodef" class="fahrtenbuchmethode"
+            checked /> Fahrtenbuch
+        </div>
+      </div>
+      <!-- Eingabe Einkommen-->
+      <div class="inputfeld">
+        <label for="einkommen"> Aktuelles monatliches Bruttoeinkommen:*</label>
+        <div class="infoboxholder"><a class="infobox" href="#INFO">i<span>
+              Falls Sie ein unregelmäßiges Bruttoeinkommen haben, nehmen Sie den Durchschnitt.<br></span></a>
+          <input type="text" name="einkommen" pattern="(-|\+)?[0-9]+([,\.][0-9]+)?" title="Bitte nur Zahlen angeben!" />
+          EUR
+        </div>
+      </div>
+      <!-- Eingabe Gehaltskürzung-->
+      <div class="inputfeld">
+        <label for="gehalte" id="gehaltelabel"> Bruttogehaltsk&uuml;rzung:*</label>
+        <div class="infoboxholder"><a class="infobox" href="#INFO">i<span>
+              <font color="black">keine Veränderung:</font><br> Tragen Sie bitte 0 ein.<br><br>
+              <font color="black">Gehaltserhöhung:</font><br> Um wie viel Euro erhöht sich Ihr Einkommen, wenn Sie
+              keinen Dienstwagen in Anspruchn nehmen?<br><br>
+              <font color="black">Gehaltskürzung:</font><br> Um wie viel Euro verringert sich Ihr Einkommen, wenn Sie
+              auf einen Dienstwagen verzichten?<br>
+            </span></a>
+          <input type="text" name="gehalte" pattern="(-|\+)?[0-9]+([,\.][0-9]+)?" title="Bitte nur Zahlen angeben!" />
+          EUR
+        </div>
+      </div>
+      <div id="zeigeeinprozentmethode" style="display:none">
+        <!-- Eingabe Bruttolistenpreis-->
+        <div class="inputfeld">
+          <label for="blp"> Bruttolistenpreis abgerundet auf volle Hundert Euro:*</label>
+          <div class="infoboxholder"><a class="infobox" href="#INFO">i<span>
+                Der Bruttolistenpreis setzt sich zusammen aus:<br>
+                - Listenpreis des Herstellers zum Zeitpunkt der Erstzulassung<br>
+                - Kosten f&uuml;r Sonderausstattung<br>
+                - Umsatzsteuer<br></span></a>
+            <input type="text" name="blp" pattern="(-|\+)?[0-9]+([,\.][0-9]+)?" title="Bitte nur Zahlen angeben!" /> EUR
+          </div>
+        </div>
+        <!-- Eingabe Entfernunga-->
+        <label for="Arbeitsweg"> <b>Angaben zum Arbeitsweg:</b></label><br>
+        <div class="inputfeld">
+          <label for="entfernunga">Einfache Entfernung abgerundet auf volle Kilometer:*</label>
+          <div class="infoboxholder">
+            <a class="infobox" href="#INFO">i<span>
+                Hierbei z&auml;hlt nur die <font color="red">einfache Strecke</font> zwischen Wohnung und
+                Arbeitsst&auml;tte und <font color="red">nicht</font> der zur&uuml;ckgelegte Hin- und
+                R&uuml;ckweg.<br></span></a>
+            <input type="text" name="entfernunga" pattern="(-|\+)?[0-9]+([,\.][0-9]+)?"
+              title="Bitte nur Zahlen angeben!" /> km
+          </div>
+        </div>
+        <!-- Abfrage Entfernunga-->
+        <div class="inputfeld">
+          <label for="abfragea"> Mind. 15-tägige Nutzung im Monat zur Firma?*</label>
+          <div class="checkboxholder"><a class="infobox" href="#INFO">i<span>
+                Hierbei stellt sich die Frage, wie oft Sie mit dem Dienstwagen zur Firma fahren.<br>
+                Direkte Fahrten zu Kunden zählen <font color="red">nicht</font> als Fahrten zur Firma.<br></span></a>
+            <input type="radio" name="abfragea" onclick="abfrageHandler(this);" value="abfrageanein" /> nein <input
+              type="radio" name="abfragea" onclick="abfrageHandler(this);" value="abfrageaja" checked /> ja
+          </div>
+        </div>
+        <!-- Häufigkeit zu Entfernunga-->
+        <div class="inputfeld" id="haeufigkeita" style="display:none">
+          <label for="entfernunga"> Anzahl der Fahrten:*</label>
+          <div class="infoboxholder">
+            <a class="infobox" href="#INFO">i<span>
+                Wie viele Tage werden Sie den Dienstwagen f&uuml;r die Fahrt zur Arbeitsstätte nutzen?<br></span></a>
+            <input type="text" name="anzahl" pattern="(-|\+)?[0-9]+([,\.][0-9]+)?" title="Bitte nur Zahlen angeben!" />
+            mal
+          </div>
+        </div>
+        <label for="doppelte Haushaltsführung"> <b>Angaben zur doppelten Haushaltsführung:</b></label><br>
+        <div class="inputfeld">
+          <label for="abfrageb"> F&uuml;hren Sie einen doppelten Haushalt?*</label>
+          <div class="checkboxholder"><a class="infobox" href="#INFO">i<span>
+                Haben Sie einen angemeldeten 2.Wohnsitz in einer anderen Stadt?<br></span></a>
+            <input type="radio" name="abfrageb" onclick="abfrageHandler(this);" value="abfragebnein" checked /> nein
+            <input type="radio" name="abfrageb" onclick="abfrageHandler(this);" value="abfragebja" /> ja
+          </div>
+        </div>
+        <!-- Eingabe Entfernungb-->
+        <div class="inputfeld" id="entfernungb" style="display:none">
+          <label for="entfernungb"> Einfache Entfernung abgerundet auf volle Kilometer:*</label>
+          <div class="infoboxholder"><a class="infobox" href="#INFO">i<span>
+                Hierbei zählt die <font color="red">einfache Strecke</font> zwischen Wohnung und Arbeitsst&auml;tte und
+                <font color="red">nicht</font> die gesamte zur&uuml;ckgelegte Strecke.<br>
+              </span></a>
+            <input type="text" name="entfernungb" pattern="(-|\+)?[0-9]+([,\.][0-9]+)?"
+              title="Bitte nur Zahlen angeben!" /> km
+          </div>
+        </div>
+        <!-- Häufigkeit zu Entfernungb-->
+        <div class="inputfeld" id="haeufigkeitb" style="display:none">
+          <label for="entfernunga"> Anzahl der Fahrten:*</label>
+          <div class="infoboxholder">
+            <a class="infobox" href="#INFO">i<span>
+                Wie oft werden Sie mit dem Dienstwagen zum Hauptwohnsitz fahren?<br></span></a>
+            <input type="text" name="anzahl2" pattern="(-|\+)?[0-9]+([,\.][0-9]+)?" title="Bitte nur Zahlen angeben!" />
+            mal
+          </div>
+        </div>
+      </div>
+      <div id="zeigefahrtenbuchmethode">
+        <!-- Eingabe Monatliche Gesamtkosten-->
+        <div class="inputfeld">
+          <label for="mgk"> Vom Arbeitgeber getragene monatlichen Gesamtkosten:*</label>
+          <div class="infoboxholder"><a class="infobox" href="#INFO">i<span>
+                Fragen Sie Ihren Arbeitgeber wie hoch die monatlich Gesamtkosten sind. Hierzu geh&ouml;ren u.a.:
+                <br>- Benzinkosten
+                <br>- Wartungs- und Reparaturkosten
+                <br>- Kfz-Steuer
+                <br>- Haftpflichtversicherung
+                <br>- Absetzung f&uuml;r Abnutzung (AfA/Abschreibung)
+                <br>- Zinsen f&uuml;r Anschaffungskredite<br></span></a>
+            <input type="text" name="mgk" pattern="(-|\+)?[0-9]+([,\.][0-9]+)?" title="Bitte nur Zahlen angeben!" /> EUR
+          </div>
+        </div>
+        <!-- Eingabe Privatfahrt-->
+        <div class="inputfeld">
+          <label for="pf">Privatfahrten in km:*</label>
+          <div class="infoboxholder">
+            <a class="infobox" href="#INFO">i<span>
+                Zu den Privatfahrten z&auml;hlen die Wege zwischen Wohnung und Arbeitst&auml;tte, Fahrten zum
+                Hauptwohnsitz bei doppelter Haushaltsf&uuml;hrung sowie Freizeitfahrten.<br></span></a>
+            <input type="text" name="pf" pattern="(-|\+)?[0-9]+([,\.][0-9]+)?" title="Bitte nur Zahlen angeben!" /> km
+          </div>
+        </div>
+        <!-- Eingabe Betriebsfahrt-->
+        <div class="inputfeld">
+          <label for="bf">Betriebsfahrten in km:*</label>
+          <div class="infoboxholder"><a class="infobox" href="#INFO">i<span>
+                Hierzu z&auml;hlen alle betriebliche Fahrten.<br></span></a>
+            <input type="text" name="bf" pattern="(-|\+)?[0-9]+([,\.][0-9]+)?" title="Bitte nur Zahlen angeben!" /> km
+          </div>
+        </div>
+      </div>
+      <label for="Steuer"> <b>Angaben zur Steuer:</b></label><br>
+      <div class="inputfeld">
+        <label for="steuerklasse"> Steuerklasse:*</label>
+        <div class="infoboxholder">
+          <a class="infobox" href="#INFO">i<span>
+              In Deutschland gibt es sechs Steuerklassen.<br>
+              Bitte wählen Sie Ihre Steuerklasse aus.<br>
+              Falls Sie die nicht kennen, können Sie sich auf der folgenden Website informieren.<br>
+              <font color="blue">http://www.steuerklassen.com/</font><br>
+            </span></a>
+          <select name="steuerklasse" id="steuerklasse">
+            <option value="" selected>-Bitte w&auml;hlen-</option>
+            <option value="1">I</option>
+            <option value="2">II</option>
+            <option value="3">III</option>
+            <option value="4">IV</option>
+            <option value="5">V</option>
+            <option value="6">VI</option>
+          </select>
+        </div>
+      </div>
+      <div class="inputfeld">
+        <label for="bundesland"> Bundesland:*</label>
+        <div class="infoboxholder">
+          <a class="infobox" href="#INFO">i<span>
+              In welchem Bundesland sind Sie als Arbeitnehmer tätig bzw. leben Sie als Selbstständiger?<br></span></a>
+          <select name="bundesland" id="bundesland">
+            <option value="" selected>-Bitte w&auml;hlen-</option>
+            <option value="BW">Baden-Württemberg</option>
+            <option value="BAYERN">Bayern</option>
+            <option value="BERLIN">Berlin</option>
+            <option value="BRANDENBURG">Brandenburg</option>
+            <option value="BREMEN">Bremen</option>
+            <option value="HH">Hamburg</option>
+            <option value="HESSEN">Hessen</option>
+            <option value="MECKLENBURG">Mecklenburg-Vorpommern</option>
+            <option value="NIEDERSACHSEN">Niedersachsen</option>
+            <option value="NRW">Nordrhein-Westfalen</option>
+            <option value="RP">Rheinland-Pfalz</option>
+            <option value="SAARLAND">Saarland</option>
+            <option value="SACHSEN">Sachsen</option>
+            <option value="SA">Sachsen-Anhalt</option>
+            <option value="SH">Schleswig-Holstein</option>
+            <option value="TH">Thüringen</option>
+          </select>
+        </div>
+      </div>
+      <div class="inputfeld">
+        <label for="kst"> Kirchensteuersatz:*</label>
+        <div class="infoboxholder">
+          <a class="infobox" href="#INFO">i<span>
+              9 % = Ihre Arbeitsst&auml;tte ist in Baden W&uuml;ttemberg oder Bayern.<br>
+              8 % = Ihre Arbeitsst&auml;tte ist in den &uuml;brigen Bundesl&auml;ndern.<br>
+              0 % = Sie geh&ouml;ren keiner Kirchengemeinde an.<br></span></a>
+          <select name="kst" id="kst">
+            <option value="" selected>-Bitte w&auml;hlen-</option>
+            <option value="0">Keine</option>
+            <option value="0.08">8 %</option>
+            <option value="0.09">9 %</option>
+          </select>
+        </div>
+      </div>
+      <!-- Button berechnen-->
+      <div class="inputfeld">
+        <label for="button"><b>* Pflichtfeld</b></label>
+        <input type="button" id="ersteBerechnung" value="berechnen" onclick="berechnen()" /><span id="waitingpls"
+          style="display:none;padding-left:5px">Einen Moment bitte.</span>
+      </div>
+    </fieldset>
+    <!-- Summe des zvE-->
+
+    <!-- Eingabe2 Rahmen-->
+    <!-- Nettounterschied-->
+    <div id="eingabefenster" style="display:none">
+      <fieldset>
+        <legend>Nettounterschied</legend>
+        <!-- NEU070517 -->
+        <div class="inputfeld" id="anzeigeDetails">
+          <label for="detailierteausgabe">&nbsp;</label>
+          <!-- NEU070517 WENN DU KEIN ABSTAND WILLST SO LÖSCHE DIESE ZEILE-->
+          <input type="button" name="detailierteausgabe" id="dritteBerechnen" value="Detaillierte Rechnung anzeigen"
+            onclick="zeigeDetails(2)" size="15" />
+        </div>
+        <!-- NEU070517  ENDE -->
+        <!-- zu versteuerndes Einkommen-->
+        <div id="detailierteausgabe" style="display:none">
+          <!-- Detailausgabe Anfang -->
+          <fieldset>
+            <legend>Summe des zu versteuernden Einkommens</legend>
+            <span id="bruttoEinkommeneins">ohne Dienstwagen</span>
+            <span id="bruttoEinkommenzwei">mit Dienstwagen</span>
+            <div class="inputfeld">
+              <label for="zve">Bruttoeinkommen</label>
+              <input type="text" readonly="readonly" name="zveo" /> <input type="text" readonly="readonly"
+                name="zvem" /> EUR
+            </div>
+          </fieldset>
+          <!--Sozialabgaben-->
+          <fieldset>
+            <legend style="background-color:white">Sozialabgaben</legend>
+            <span id="bruttoEinkommeneins">ohne Dienstwagen</span>
+            <span id="bruttoEinkommenzwei">mit Dienstwagen</span>
+            <!--Krankenversicherung-->
+            <div class="inputfeld">
+              <label for="kv"> Krankenversicherung</label>
+              <div class="infoboxholder"><a class="infobox" href="#INFO">i<span>
+                    Bruttogehalt neu x 8,4 %<br></span></a>
+                <input type="text" readonly="readonly" name="kvo" />
+              </div>
+              <input type="text" readonly="readonly" name="kvm" /> EUR
+            </div>
+            <!-- Pflegeversicherung-->
+            <div class="inputfeld">
+              <label for="pv"> Pflegeversicherung</label>
+              <div class="infoboxholder"><a class="infobox" href="#INFO">i<span>
+                    Bruttogehalt neu x 1,275 %<br></span></a>
+                <input type="text" readonly="readonly" name="pvo" />
+              </div>
+              <input type="text" readonly="readonly" name="pvm" /> EUR
+            </div>
+            <!--Rentenversicherung-->
+            <div class="inputfeld">
+              <label for="rv"> Rentenversicherung</label>
+              <div class="infoboxholder"><a class="infobox" href="#INFO">i<span>
+                    Bruttogehalt neu x 9,35 %<br></span></a>
+                <input type="text" readonly="readonly" name="rvo" />
+              </div>
+              <input type="text" readonly="readonly" name="rvm" /> EUR
+            </div>
+            <!--Arbeitlosenversicherung-->
+            <div class="inputfeld">
+              <label for="av"> Arbeitslosenversicherung</label>
+              <div class="infoboxholder"><a class="infobox" href="#INFO">i<span>
+                    Bruttogehalt neu x 1,5 %<br></span></a>
+                <input type="text" readonly="readonly" name="avo" />
+              </div>
+              <input type="text" readonly="readonly" name="avm" /> EUR
+            </div>
+            <!-- Summe Sozialabgaben-->
+            <div class="inputfeld">
+              <label for="ssa"><b>Summe Sozialabgaben</b></label>
+              <div class="infoboxholder"><a class="infobox" href="#INFO">i<span>
+                    Krankenversicherung + Pfelegeversicherung + Rentenversicherung + Arbeitslosenversicherung
+                    <br></span></a>
+                <input type="text" readonly="readonly" name="ssao" />
+              </div>
+              <input type="text" readonly="readonly" name="ssam" /> EUR
+            </div>
+          </fieldset>
+          <!-- Steuerabgaben-->
+          <fieldset>
+            <legend style="background-color:white">Steuerabgaben</legend>
+            <span id="bruttoEinkommeneins">ohne Dienstwagen</span>
+            <span id="bruttoEinkommenzwei">mit Dienstwagen</span>
+            <!-- Lohnsteuer-->
+            <div class="inputfeld">
+              <label for="lohn1"> Lohnsteuer</label>
+              <input type="text" readonly="readonly" name="lohn1o" /> <input type="text" readonly="readonly"
+                name="lohn1m" /> EUR
+            </div>
+            <!-- Soli-Zuschlag-->
+            <div class="inputfeld">
+              <label for="soli"> Soli-Zuschlag</label>
+              <div class="infoboxholder"><a class="infobox" href="#INFO">i<span>
+                    Lohnsteuer x 5,5 % <br></span></a>
+                <input type="text" readonly="readonly" name="solio" />
+              </div>
+              <input type="text" readonly="readonly" name="solim" /> EUR
+            </div>
+            <!-- Kirchensteuer-->
+            <div class="inputfeld">
+              <label for="kst1"> Kirchensteuer</label>
+              <div class="infoboxholder"><a class="infobox" href="#INFO">i<span>
+                    Lohnsteuer x Kirchensteuersatz (0 %, 8 %, 9 %)<br></span></a>
+                <input type="text" readonly="readonly" name="ksto" />
+              </div>
+              <input type="text" readonly="readonly" name="kstm" /> EUR
+            </div>
+            <!-- Summe Steuerabgaben-->
+            <div class="inputfeld">
+              <label for="ssta"><b>Summe Steuerabgaben</b></label>
+              <div class="infoboxholder"><a class="infobox" href="#INFO">i<span>
+                    Lohnsteuer + Soli-Zuschlag + Kirchensteuer<br></span></a>
+                <input type="text" readonly="readonly" name="sstao" />
+              </div>
+              <input type="text" readonly="readonly" name="sstam" /> EUR
+            </div>
+          </fieldset>
+          <!-- Summe des geldwerten Vorteils-->
+          <fieldset>
+            <legend style="background-color:white">Geldwerter Vorteil</legend>
+            <span id="bruttoEinkommeneins">ohne Dienstwagen</span>
+            <span id="bruttoEinkommenzwei">mit Dienstwagen</span>
+            <div class="inputfeld">
+              <label for="gv"> Geldwerter Vorteil</label>
+              <div class="infoboxholder"><a class="infobox" href="#INFO">i<span>
+                    Ohne Dienstwagen 0 EUR,
+                    ansonsten wird der geldwerter Vorteil folgendermaßen berechnet:<br><br>
+                    Private Nutzung + Arbeitsweg + Doppelte Haushaltsf&uuml;hrung<br><br>
+                    <font color="black">Private Nutzung:</font><br>
+                    1 % x Bruttolistenpreis<br><br>
+                    <font color="black">Arbeitsweg:</font><br>
+                    Wenn Sie weniger als 15 Tagen den Dienstwagen zur Firma nutzen:<br>
+                    0,002 % x Bruttolistenpreis x Entfernung zur Firma x Anzahl <br><br>
+                    Wenn Sie mindestens 15 Tagen den Dienstwagen zur Firma nutzen:
+                    0,03 % x Bruttolistenpreis x Entfernung zur Firma<br><br>
+                    <font color="black">Doppelte Haushaltsführung:</font><br>
+                    Wenn Sie nur einmal w&ouml;chentlich mit dem Dienstwagen zum Hauptwohnsitz fahren,
+                    wird kein separater geldwerter Vorteil berechnet. Erst wenn Sie &ouml;fter fahren,
+                    wird der geldwerte Vorteil für die Tage, die Sie mehr gefahrten sind folgendermaßen berechnet:<br>
+                    0,002 % x Bruttolistenpreis x Entfernung zum Hauptwohnsitz x Anzahl Tage<br>
+                  </span></a>
+                <input type="text" readonly="readonly" name="gvo" />
+              </div>
+              <input type="text" readonly="readonly" name="gvm" /> EUR
+            </div>
+          </fieldset>
+        </div>
+        <!-- detail ausgabe ende -->
+        <!-- Ergebnis-->
+        <fieldset>
+          <legend>Ergebnis</legend>
+          <span id="bruttoEinkommeneins">ohne Dienstwagen</span>
+          <span id="bruttoEinkommenzwei">mit Dienstwagen</span>
+          <div class="inputfeld">
+            <label for="pv"> Bruttoeinkommen neu</label>
+            <div class="infoboxholder"><a class="infobox" href="#INFO">i<span>
+                  Zum Bruttogehalt kommt der geltwerter Vorteil hinzu, der folgendermaßen berechnet wird:<br>
+                  Private Nutzung + Arbeitsweg + Doppelte Haushaltsf&uuml;hrung<br><br>
+                  <font color="black">Private Nutzung:</font><br>
+                  1 % x Bruttolistenpreis<br><br>
+                  <font color="black">Arbeitsweg:</font><br>
+                  Wenn Sie weniger als 15 Tagen den Dienstwagen zur Firma nutzen:<br>
+                  0,002 % x Bruttolistenpreis x Entfernung zur Firma x Anzahl <br><br>
+                  Wenn Sie mindestens 15 Tagen den Dienstwagen zur Firma nutzen:
+                  0,03 % x Bruttolistenpreis x Entfernung zur Firma<br><br>
+                  <font color="black">Doppelte Haushaltsführung:</font><br>
+                  Wenn Sie nur einmal w&ouml;chentlich mit dem Dienstwagen zum Hauptwohnsitz fahren,
+                  wird kein separater geldwerter Vorteil berechnet. Erst wenn Sie &ouml;fter fahren,
+                  wird der geldwerte Vorteil folgendermaßen berechnet:<br>
+                  0,002 % x Bruttolistenpreis x Entfernung zum Hauptwohnsitz x Anzahl Tage<br>
+                </span></a>
+              <input type="text" readonly="readonly" name="summe" />
+            </div>
+            <input type="text" readonly="readonly" name="summeneu" /> EUR
+          </div>
+          <div class="inputfeld">
+            <label for="netto"> Nettolohn</label>
+            <div class="infoboxholder"><a class="infobox" href="#INFO">i<span>
+                  Zu versteuerendes Einkommen - Sozialabgaben - Steuern<br></span></a>
+              <input type="text" readonly="readonly" name="nettoo" />
+            </div>
+            <input type="text" readonly="readonly" name="nettom" /> EUR
+          </div>
+          <div class="inputfeld">
+            <label for="nu"> <b>Nettounterschied</b></label>
+            <div class="infoboxholder"><a class="infobox" href="#INFO">i<span>
+                  Nettolohn ohne Dienstwagen - Nettolohn mit Dienstwagen <br></span></a>
+              <input type="text" class="nettounterschied" readonly="readonly" name="nu" /> EUR
+            </div>
+            <br><br>
+            <p style="line-height: 150%">Können Sie mit dem monatlichen Nettounterschied die Kosten für Anschaffung,
+              Benzin, Versicherung, Kfz-Steuer, Service, Wartung und Inspektion f&uuml;r einen Privatwagen abdecken?
+              Wenn nicht, lohnt es sich den Dienstwagen anzunehmen.</p>
+          </div>
+          <div class="inputfeld">
+          </div>
+        </fieldset>
+      </fieldset>
+      <!-- NEU070517 -->
+      <div class="inputfeld" id="ausblendeDetails" style="display:none">
+        <label for="detailierteausgabe">&nbsp;</label>
+        <input type="button" name="detailierteausgabe" id="dritteBerechnen" value="Detaillierte Rechnung ausblenden"
+          onclick="zeigeDetails(1)" size="15" />
+      </div>
+      <!-- NEU070517 ENDE -->
+    </div>
+    <div class="inputfeld">
+      <input type="button" name="resetknopf" id="dritteBerechnen" value="neu berechnen" onclick="neustartRechnung()"
+        size="15" />
+    </div>
+  </form>
+  <script>
+      // RESETTED FORM BEI RELOAD
+      (function () {
+        FORMULAR = document.BerechnungNU;
+        FORMULAR.reset();
+      })();
+  </script>
+</body>
+
+</html>
